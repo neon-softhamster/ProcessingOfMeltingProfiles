@@ -4,7 +4,7 @@
 - pandas
 - openpyxl
 
-# Install:
+## Install:
 
 ```sh
 $ git clone https://github.com/neon-softhamster/ProcessingOfMeltingProfiles
