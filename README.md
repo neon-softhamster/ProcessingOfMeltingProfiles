@@ -3,6 +3,7 @@
 
 - pandas
 - openpyxl
+- xlrd
 
 ## Install:
 
@@ -10,5 +11,5 @@
 $ git clone https://github.com/neon-softhamster/ProcessingOfMeltingProfiles
 ```
 ```sh
-$ pip install pandas openpyxl
+$ pip install pandas openpyxl xlrd
 ```

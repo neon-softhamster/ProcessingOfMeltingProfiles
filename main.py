@@ -17,11 +17,12 @@ def dispersion(a, b, Y, T):
 
 if __name__ == '__main__':
     # file notation
-    file_name = 'ATPaptACmm+4ATP'
-    sheet_name_body = 'MM ATP '
-    sheet_name_num = [1, 4, 1]
+    file_name = 'data_processed'
+    sheet_name_body = 'no '
+    sheet_name_num = [1, 8, 1]
     col_name_body = 'pH '
     col_name_num = [5.0, 8.5, 0.5]
+    normalize = False
 
     # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
     A = 12.70776
@@ -31,8 +32,8 @@ if __name__ == '__main__':
     cut = 252
 
     # Range of background intensities checked sequentially with step
-    maxBckIntensity = 15000
-    minBckIntensity = -10000
+    maxBckIntensity = 20000
+    minBckIntensity = -20000
     step = 20
     nb_arg = int((maxBckIntensity - minBckIntensity) / step)
 
@@ -65,8 +66,12 @@ if __name__ == '__main__':
                 indexOfLowestB = B_abs.index(min(B_abs))
 
                 col_result = [0] * len(col)
-                for i in range(len(col)):
-                    col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_data[indexOfLowestB]) / b[indexOfLowestB]
+                if normalize == True:
+                    for i in range(len(col)):
+                        col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_data[indexOfLowestB]) / b[indexOfLowestB]
+                else:
+                    for i in range(len(col)):
+                        col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_data[indexOfLowestB])
 
                 df = pd.DataFrame({'T': T})
                 df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=0)

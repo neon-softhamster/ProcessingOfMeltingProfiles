@@ -1,15 +1,17 @@
+# This program makes tables line by line ed est A1...A12
+
 import pandas as pd
 import numpy as np
 
 
 if __name__ == '__main__':
     # file notation
-    src_file_name = 'Untitled_data'
+    src_file_name = 'data'
     src_sheet_name = 'Multicomponent Data'
     src_col_name = 'CY3'
 
-    sheet_name_body = 'ads'
-    sheet_name_num = [8, 19, 1]
+    sheet_name_body = 'no '
+    sheet_name_num = [1, 8, 1]
     col_name_body = 'pH '
     col_name_num = [5.0, 8.5, 0.5]
 
