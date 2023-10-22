@@ -15,31 +15,23 @@ def dispersion(a, b, Y, T):
 
 
 if __name__ == '__main__':
-    # file notation
-    file_name = 'ACmm-short + ATP'
-    sheet_name_body = 'ACmm-short + ATP '
-    sheet_name_num = [1, 3, 1]
-    col_name_body = 'pH '
-    col_name_num = [5.0, 8.5, 0.5]
-    normalizeToOne = True
-    normOnRealSig = True
-    T_cut_less = 88
-
-    # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
-    A = 12.70776
-    K = -0.0371940
-
-    # Range of background intensities checked sequentially with step
-    maxBckIntensity = 10000
-    minBckIntensity = -3000
-    step = 20
+    with open('task.txt') as f:
+        lines = f.readlines()
+    for i in range(len(lines)):
+        exec(lines[i])
 
     with pd.ExcelWriter('Processed/[processed]_' + file_name + '.xlsx') as writer:
-        for m in np.arange(sheet_name_num[0], sheet_name_num[1] + sheet_name_num[2], sheet_name_num[2]):
-            if normOnRealSig:
-                excel_normSig_data = pd.read_excel('cy3_norm.xlsx', sheet_name='cy3')
-                normSig = excel_normSig_data['average'].tolist()
+        excel_normSig_data = pd.read_excel('cy3_norm.xlsx', sheet_name='cy3')
+        if normOnRealSignal:
+            normSignal = excel_normSig_data['average'].tolist()
+        else:
+            T_norm = excel_normSig_data['T'].tolist()
+            nbOfTPoints = len(T_norm)
+            normSignal = [0] * nbOfTPoints
+            for i in range(nbOfTPoints):
+                normSignal[i] = np.exp(A) * np.exp(K * T_norm[i])
 
+        for m in np.arange(sheet_name_num[0], sheet_name_num[1] + sheet_name_num[2], sheet_name_num[2]):
             sheet_name = sheet_name_body + str(m)
             excel_data = pd.read_excel('Raw/' + file_name + '.xlsx', sheet_name=sheet_name)
 
@@ -54,16 +46,13 @@ if __name__ == '__main__':
                 b = [0] * int(nb_arg)
                 cut = int((T_cut_less - T[0]) / abs(T[1] - T[0]) + 2)
                 T_cut = T[cut:]
-                normSig_cut = normSig[cut:]
+                normSig_cut = normSignal[cut:]
                 col_cut = col[cut:]
                 col2check = [0] * len(T_cut)
 
                 for j in range(nb_arg):
                     for i in range(len(T_cut)):
-                        if normOnRealSig:
-                            col2check[i] = col_cut[i] / (normSig_cut[i] + j * step + minBckIntensity)
-                        else:
-                            col2check[i] = col_cut[i] / (np.exp(A) * np.exp(K * T_cut[i]) + j * step + minBckIntensity)
+                        col2check[i] = col_cut[i] / (normSig_cut[i] + j * step + minBckIntensity)
 
                     param = np.polyfit(T_cut, col2check, 1)
                     B_value[j] = j * step + minBckIntensity
@@ -74,20 +63,12 @@ if __name__ == '__main__':
                 indexOfLowestB = B_value_abs.index(min(B_value_abs))
 
                 col_result = [0] * len(col)
-                if normOnRealSig:
-                    if normalizeToOne:
-                        for i in range(len(col)):
-                            col_result[i] = col[i] / (normSig[i] + B_value[indexOfLowestB]) / b[indexOfLowestB]
-                    else:
-                        for i in range(len(col)):
-                            col_result[i] = col[i] / (normSig[i] + B_value[indexOfLowestB])
+                if normalizeToOne:
+                    for i in range(len(col)):
+                        col_result[i] = col[i] / (normSignal[i] + B_value[indexOfLowestB]) / b[indexOfLowestB]
                 else:
-                    if normalizeToOne:
-                        for i in range(len(col)):
-                            col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_value[indexOfLowestB]) / b[indexOfLowestB]
-                    else:
-                        for i in range(len(col)):
-                            col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_value[indexOfLowestB])
+                    for i in range(len(col)):
+                        col_result[i] = col[i] / (normSignal[i] + B_value[indexOfLowestB])
 
                 df = pd.DataFrame({'T': T})
                 df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=0)
@@ -98,7 +79,7 @@ if __name__ == '__main__':
                 bckg_value = [0] * 2
                 bckg_value[0] = B_value[indexOfLowestB]
                 bckg_value[1] = b[indexOfLowestB]
-                df = pd.DataFrame({col_name + ' bg': bckg_value})
+                df = pd.DataFrame({col_name: bckg_value})
                 df.to_excel(writer, sheet_name=sheet_name, index=False,
                             startcol=(p - col_name_num[0]) / col_name_num[2] + 2 + col_name_num[1] + col_name_num[2])
 
