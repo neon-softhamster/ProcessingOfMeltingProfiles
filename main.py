@@ -1,8 +1,7 @@
-# This program allow to find out "BckIntensity" in
-# N(A, K, T) = 1 / (exp(A) * exp(K*T) + BckIntensity) normalization factor
-# in such a way that the given section of the normalized function
-# Melt_Curve(T) / N(A, K, T)
-# (at high temperatures) is horizontal
+# This program allow to find out "BckIntensity" in two cases:
+# 1.    N1(A, K, T) = 1 / (exp(A) * exp(K*T) + BckIntensity) normalization factor
+# 2.    N2(A, K, T) = 1 / (freeDyeSignal + BckIntensity) normalization factor
+# The given section of the normalized function Melt_Curve(T) / Nx(A, K, T) (at high temperatures) is horizontal
 
 import pandas as pd
 import numpy as np
@@ -24,28 +23,26 @@ if __name__ == '__main__':
     col_name_num = [5.0, 8.5, 0.5]
     normalizeToOne = True
     normOnRealSig = True
+    T_cut_less = 85
 
     # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
     A = 12.70776
     K = -0.0371940
 
-    # cut
-    cut = 280
-
     # Range of background intensities checked sequentially with step
     maxBckIntensity = 10000
-    minBckIntensity = -10000
+    minBckIntensity = -3000
     step = 20
     nb_arg = int((maxBckIntensity - minBckIntensity) / step)
 
-    with pd.ExcelWriter(file_name + '_processed.xlsx') as writer:
+    with pd.ExcelWriter('Processed/[processed]_' + file_name + '.xlsx') as writer:
         for m in np.arange(sheet_name_num[0], sheet_name_num[1] + sheet_name_num[2], sheet_name_num[2]):
             if normOnRealSig:
                 excel_normSig_data = pd.read_excel('cy3_norm.xlsx', sheet_name='cy3')
                 normSig = excel_normSig_data['average'].tolist()
 
             sheet_name = sheet_name_body + str(m)
-            excel_data = pd.read_excel(file_name + '.xlsx', sheet_name=sheet_name)
+            excel_data = pd.read_excel('Raw/' + file_name + '.xlsx', sheet_name=sheet_name)
 
             for p in np.arange(col_name_num[0], col_name_num[1] + col_name_num[2], col_name_num[2]):
                 col_name = col_name_body + str(p)
@@ -55,6 +52,7 @@ if __name__ == '__main__':
                 B_value = [0] * int(nb_arg)
                 B_value_abs = [0] * int(nb_arg)
                 b = [0] * int(nb_arg)
+                cut = int((T_cut_less - T[0]) / abs(T[1] - T[0]) + 2)
                 T_cut = T[cut:]
                 normSig_cut = normSig[cut:]
                 col_cut = col[cut:]
@@ -91,8 +89,9 @@ if __name__ == '__main__':
                         for i in range(len(col)):
                             col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_value[indexOfLowestB])
 
-                bckg_value = [0] * 1
+                bckg_value = [0] * 2
                 bckg_value[0] = B_value[indexOfLowestB]
+                bckg_value[1] = b[indexOfLowestB]
                 df = pd.DataFrame({'T': T})
                 df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=0)
                 df = pd.DataFrame({col_name: col_result})
