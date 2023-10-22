@@ -1,4 +1,4 @@
-# This program allow to find out "BckIntensity" in two cases:
+# This program allow to find out "BckIntensity" in two modes:
 # 1.    N1(A, K, T) = 1 / (exp(A) * exp(K*T) + BckIntensity) normalization factor
 # 2.    N2(A, K, T) = 1 / (freeDyeSignal + BckIntensity) normalization factor
 # The given section of the normalized function Melt_Curve(T) / Nx(A, K, T) (at high temperatures) is horizontal
@@ -16,14 +16,14 @@ def dispersion(a, b, Y, T):
 
 if __name__ == '__main__':
     # file notation
-    file_name = 'ACmm-short'
-    sheet_name_body = 'ACmm-short '
-    sheet_name_num = [1, 1, 1]
+    file_name = 'ACmm-short + ATP'
+    sheet_name_body = 'ACmm-short + ATP '
+    sheet_name_num = [1, 3, 1]
     col_name_body = 'pH '
     col_name_num = [5.0, 8.5, 0.5]
     normalizeToOne = True
     normOnRealSig = True
-    T_cut_less = 85
+    T_cut_less = 88
 
     # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
     A = 12.70776
@@ -33,7 +33,6 @@ if __name__ == '__main__':
     maxBckIntensity = 10000
     minBckIntensity = -3000
     step = 20
-    nb_arg = int((maxBckIntensity - minBckIntensity) / step)
 
     with pd.ExcelWriter('Processed/[processed]_' + file_name + '.xlsx') as writer:
         for m in np.arange(sheet_name_num[0], sheet_name_num[1] + sheet_name_num[2], sheet_name_num[2]):
@@ -49,6 +48,7 @@ if __name__ == '__main__':
                 T = excel_data['T'].tolist()
                 col = excel_data[col_name].tolist()
 
+                nb_arg = int((maxBckIntensity - minBckIntensity) / step)
                 B_value = [0] * int(nb_arg)
                 B_value_abs = [0] * int(nb_arg)
                 b = [0] * int(nb_arg)
@@ -89,16 +89,23 @@ if __name__ == '__main__':
                         for i in range(len(col)):
                             col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_value[indexOfLowestB])
 
+                df = pd.DataFrame({'T': T})
+                df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=0)
+
+                df = pd.DataFrame({col_name: col_result})
+                df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=(p - col_name_num[0]) / col_name_num[2] + 1)
+
                 bckg_value = [0] * 2
                 bckg_value[0] = B_value[indexOfLowestB]
                 bckg_value[1] = b[indexOfLowestB]
-                df = pd.DataFrame({'T': T})
-                df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=0)
-                df = pd.DataFrame({col_name: col_result})
-                df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=(p - col_name_num[0]) / col_name_num[2] + 1)
                 df = pd.DataFrame({col_name + ' bg': bckg_value})
                 df.to_excel(writer, sheet_name=sheet_name, index=False,
-                            startcol=(p - col_name_num[0]) / col_name_num[2] + 1 + col_name_num[1] + col_name_num[2])
+                            startcol=(p - col_name_num[0]) / col_name_num[2] + 2 + col_name_num[1] + col_name_num[2])
+
+            bckg_legend = ['Background intensity','Melted probe/Dye']
+            df = pd.DataFrame({'Value': bckg_legend})
+            df.to_excel(writer, sheet_name=sheet_name, index=False,
+                        startcol=(col_name_num[1] - col_name_num[0]) / col_name_num[2] + 3)
 
     pass
 
