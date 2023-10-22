@@ -1,8 +1,3 @@
-# This program allow to find out "BckIntensity" in two modes:
-# 1.    N1(A, K, T) = 1 / (exp(A) * exp(K*T) + BckIntensity) normalization factor
-# 2.    N2(A, K, T) = 1 / (freeDyeSignal + BckIntensity) normalization factor
-# The given section of the normalized function Melt_Curve(T) / Nx(A, K, T) (at high temperatures) is horizontal
-
 import pandas as pd
 import numpy as np
 
