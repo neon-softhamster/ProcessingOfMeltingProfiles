@@ -17,8 +17,8 @@ def dispersion(a, b, Y, T):
 
 if __name__ == '__main__':
     # file notation
-    file_name = 'noACmm'
-    sheet_name_body = 'noACmm '
+    file_name = 'ACmm-short'
+    sheet_name_body = 'ACmm-short '
     sheet_name_num = [1, 1, 1]
     col_name_body = 'pH '
     col_name_num = [5.0, 8.5, 0.5]
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     K = -0.0371940
 
     # cut
-    cut = 282
+    cut = 280
 
     # Range of background intensities checked sequentially with step
     maxBckIntensity = 10000
@@ -91,11 +91,15 @@ if __name__ == '__main__':
                         for i in range(len(col)):
                             col_result[i] = col[i] / (np.exp(A) * np.exp(K * T[i]) + B_value[indexOfLowestB])
 
-
+                bckg_value = [0] * 1
+                bckg_value[0] = B_value[indexOfLowestB]
                 df = pd.DataFrame({'T': T})
                 df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=0)
                 df = pd.DataFrame({col_name: col_result})
                 df.to_excel(writer, sheet_name=sheet_name, index=False, startcol=(p - col_name_num[0]) / col_name_num[2] + 1)
+                df = pd.DataFrame({col_name + ' bg': bckg_value})
+                df.to_excel(writer, sheet_name=sheet_name, index=False,
+                            startcol=(p - col_name_num[0]) / col_name_num[2] + 1 + col_name_num[1] + col_name_num[2])
 
     pass
 
