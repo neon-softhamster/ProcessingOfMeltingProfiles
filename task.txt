@@ -8,7 +8,7 @@
 #------------------------------------------------------------------------------------------------------
 
 # File notation
-file_name			= 'ACmm-short + ATP'
+file_name		= 'ACmm-short + ATP'
 sheet_name_body		= 'ACmm-short + ATP '
 sheet_name_num		= [1, 3, 1]
 col_name_body		= 'pH '
@@ -17,13 +17,13 @@ col_name_num		= [5.0, 8.5, 0.5]
 # Task
 normalizeToOne		= True
 normOnRealSignal	= True
-T_cut_less			= 88
+T_cut_less		= 88
 
 # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
-A					= 12.70776
-K					= -0.0371940
+A			= 12.70776
+K			= -0.0371940
 
 # Range of background intensities checked sequentially with step (use int)
 maxBckIntensity		= 10000
 minBckIntensity		= -3000
-step				= 20
+step			= 20
