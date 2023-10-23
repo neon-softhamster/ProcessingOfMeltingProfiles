@@ -16,7 +16,7 @@ if __name__ == '__main__':
         exec(lines[i])
 
     with pd.ExcelWriter('Processed/[processed]_' + file_name + '.xlsx') as writer:
-        excel_normSig_data = pd.read_excel('cy3_norm.xlsx', sheet_name='cy3')
+        excel_normSig_data = pd.read_excel(file_normSignal + '.xlsx', sheet_name='dye')
         if normOnRealSignal:
             normSignal = excel_normSig_data['average'].tolist()
         else:
@@ -78,7 +78,10 @@ if __name__ == '__main__':
                 df.to_excel(writer, sheet_name=sheet_name, index=False,
                             startcol=(p - col_name_num[0]) / col_name_num[2] + 2 + col_name_num[1] + col_name_num[2])
 
-            bckg_legend = ['Background intensity','Melted probe/Dye']
+            bckg_legend = ['Background intensity',
+                           'Melted probe/Dye',
+                           'T_cut = ' + str(T_cut_less) + 'C',
+                           'Normed to "' + file_normSignal + '"']
             df = pd.DataFrame({'Value': bckg_legend})
             df.to_excel(writer, sheet_name=sheet_name, index=False,
                         startcol=(col_name_num[1] - col_name_num[0]) / col_name_num[2] + 3)

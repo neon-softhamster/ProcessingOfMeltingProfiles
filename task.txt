@@ -7,23 +7,24 @@
 # !!! Locate your raw files in ../Raw folder !!!
 #------------------------------------------------------------------------------------------------------
 
-# File notation
-file_name		= 'ACmm-short + ATP'
-sheet_name_body		= 'ACmm-short + ATP '
-sheet_name_num		= [1, 3, 1]
+# Files notation
+file_normSignal		= 'cy3_norm'
+file_name		= 'ACmm'
+sheet_name_body		= 'ACmm '
+sheet_name_num		= [1, 1, 1]
 col_name_body		= 'pH '
 col_name_num		= [5.0, 8.5, 0.5]
 
 # Task
 normalizeToOne		= True
 normOnRealSignal	= True
-T_cut_less		= 88
+T_cut_less		= 65
 
 # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
 A			= 12.70776
 K			= -0.0371940
 
 # Range of background intensities checked sequentially with step (use int)
-maxBckIntensity		= 10000
-minBckIntensity		= -3000
+maxBckIntensity		= 30000
+minBckIntensity		= -10000
 step			= 20
