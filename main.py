@@ -82,6 +82,3 @@ if __name__ == '__main__':
             df = pd.DataFrame({'Value': bckg_legend})
             df.to_excel(writer, sheet_name=sheet_name, index=False,
                         startcol=(col_name_num[1] - col_name_num[0]) / col_name_num[2] + 3)
-
-    pass
-
