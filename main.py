@@ -16,7 +16,7 @@ if __name__ == '__main__':
         exec(lines[i])
 
     with pd.ExcelWriter('Processed/[processed]_' + file_name + '.xlsx') as writer:
-        excel_normSig_data = pd.read_excel(file_normSignal + '.xlsx', sheet_name='dye')
+        excel_normSig_data = pd.read_excel('[norm]_' + file_normSignal + '.xlsx', sheet_name='dye')
         if normOnRealSignal:
             normSignal = excel_normSig_data['average'].tolist()
         else:

@@ -8,23 +8,23 @@
 #------------------------------------------------------------------------------------------------------
 
 # Files notation
-file_normSignal		= 'cy3_norm'
-file_name		= 'ACmm'
-sheet_name_body		= 'ACmm '
+file_normSignal		= 'cy3-T20-bhq2'
+file_name		= 'ATPapt'
+sheet_name_body		= 'ATPapt '
 sheet_name_num		= [1, 1, 1]
 col_name_body		= 'pH '
 col_name_num		= [5.0, 8.5, 0.5]
 
 # Task
-normalizeToOne		= True
+normalizeToOne		= False
 normOnRealSignal	= True
-T_cut_less		= 65
+T_cut_less		= 80
 
 # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
 A			= 12.70776
 K			= -0.0371940
 
 # Range of background intensities checked sequentially with step (use int)
-maxBckIntensity		= 30000
-minBckIntensity		= -10000
+maxBckIntensity		= 20
+minBckIntensity		= 0
 step			= 20
