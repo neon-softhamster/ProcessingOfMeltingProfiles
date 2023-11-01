@@ -7,27 +7,26 @@
 # !!! Locate your raw files in ../Raw folder !!!
 # ------------------------------------------------------------------------------------------------------
 
-# Files notation
-file_normSignal 	= 'cy3-T20-bhq2'
+# Files specifications
+file_normSignal 	= 'cy3'
 # avaliable: 		cy3
 #			cy3-T20-bhq2
 #			ads14-ads14
 
-file_signal 		= 'ATPaptACmm + ads8-14'
-sheet_name_body 	= 'pH '
-sheet_name_num 		= [5.0, 8.5, 0.5]
+file_signal 		= 'ATPaptACmm + adsN ratio 1-10'
+sheet_name_body 	= 'ratio '
+sheet_name_num 		= [1, 5, 1]
 col_name_body 		= 'ads'
 col_name_num 		= [8, 14, 1]
 
 # Task
+Mode			= 4
 normalizeToOne 		= True
-normOnRealSignal 	= False
 T_cut_from 		= 80
 T_cut_to 		= 95
-
-findExponentParameters 	= False
-T_exp_determ_from 	= 5
-T_exp_determ_to 	= 10
+useGlobalInterval	= True
+T_exp_determ_from 	= 80
+T_exp_determ_to 	= 95
 evoluteExponent 	= False
 
 # Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
@@ -36,5 +35,5 @@ K 			= -0.0371940
 
 # Range of background intensities checked sequentially with step (use int)
 maxBckgIntensity 	= 40000
-minBckgIntensity 	= -20000
+minBckgIntensity 	= -40000
 step 			= 20

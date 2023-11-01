@@ -4,7 +4,7 @@ import numpy as np
 
 def generate_normalization_curve(temperature, a, k):
     normalization_curve = [0] * len(temperature)
-    if evoluteExponent:
+    if evoluteExponent and Mode == 3:
         temperature_interval = temperature[0] - temperature[len(temperature) - 1]
         for i in range(len(temperature)):
             exp_ak_fraction = 1 / (1 + np.exp(0.32 * (temperature[i] - 50)))
@@ -36,30 +36,40 @@ if __name__ == '__main__':
     for i in range(len(lines)):
         exec(lines[i])
 
-    with pd.ExcelWriter('Processed/[processed]_' + file_signal + '.xlsx') as writer:
-        excel_normSig_data = pd.read_excel('[norm]_' + file_normSignal + '.xlsx', sheet_name='dye')
-        if normOnRealSignal:
-            normSignal = excel_normSig_data['average'].tolist()
-        else:
-            normSignal = generate_normalization_curve(excel_normSig_data['T'].tolist(), A, K)
+    with pd.ExcelWriter('Processed/[processed]_' + file_signal + ' (Mode No.' + str(Mode) + ').xlsx') as writer:
 
         for m in np.arange(sheet_name_num[0], sheet_name_num[1] + sheet_name_num[2], sheet_name_num[2]):
+            # Load sheet and T column
             sheet_name = sheet_name_body + str(m)
             excel_data = pd.read_excel('Raw/' + file_signal + '.xlsx', sheet_name=sheet_name)
             T = excel_data['T'].tolist()
             T_cut = cut_data(T, [T_cut_from, T_cut_to])
 
             for p in np.arange(col_name_num[0], col_name_num[1] + col_name_num[2], col_name_num[2]):
-                # Get signal from specified file
+                # Load column and get signal
                 Signal_col_name = col_name_body + str(p)
                 Signal = excel_data[Signal_col_name].tolist()
+                Additional_info = excel_data['Info ' + Signal_col_name].tolist()
 
-                # Calculate normalization exponent if needed
-                if findExponentParameters:
-                    T_info = excel_data['T interval ' + Signal_col_name].tolist()
-                    if T_info[0] != 'None':
-                        T_exp_determ_from = T_info[0]
-                        T_exp_determ_to = T_info[1]
+                # Creation of normalization signal
+                if Mode == 1:
+                    normSpecification = file_normSignal
+                    excel_normSig_data = pd.read_excel('[norm]_' + file_normSignal + '.xlsx', sheet_name='dye')
+                    normSignal = excel_normSig_data['average'].tolist()
+
+                if Mode == 2:
+                    normSpecification = "exp( " + str(A) + " )" + " * exp( " + str(K) + " * T)"
+                    normSignal = generate_normalization_curve(T, A, K)
+
+                if Mode == 3:
+                    if Additional_info[0] != 'None':
+                        if not useGlobalInterval:
+                            T_exp_determ_from = Additional_info[0]
+                            T_exp_determ_to = Additional_info[1]
+                        else:
+                            pass
+                        normSpecification = "exp derived from the [" + str(T_exp_determ_from) + " " + str(T_exp_determ_to) + "] interval of the melting curve, evoluteExponent = " + str(
+                            evoluteExponent)
                         T_exp_determ_cut = cut_data(T, [T_exp_determ_from, T_exp_determ_to])
                         Signal_exp_determ_cut = cut_data(Signal, [T_exp_determ_from, T_exp_determ_to])
                         for k in range(len(Signal_exp_determ_cut)):
@@ -67,9 +77,16 @@ if __name__ == '__main__':
                         startRegionLinParameters = np.polyfit(T_exp_determ_cut, Signal_exp_determ_cut, 1)
                         a = startRegionLinParameters[1]
                         k = startRegionLinParameters[0]
-                        normSignal = generate_normalization_curve(excel_normSig_data['T'].tolist(), a, k)
+                        normSignal = generate_normalization_curve(T, a, k)
                     else:
-                        pass
+                        # use global parameters
+                        normSignal = generate_normalization_curve(T, A, K)
+
+                if Mode == 4:
+                    normSpecification = "exp specified at initial file"
+                    a = Additional_info[4]
+                    k = Additional_info[2]
+                    normSignal = generate_normalization_curve(T, a, k)
 
                 nb_arg = int((maxBckgIntensity - minBckgIntensity) / step)
                 # Lists of BckgIntensity 'B'
@@ -119,7 +136,7 @@ if __name__ == '__main__':
             bckg_legend = ['Background intensity',
                            'Melted probe/Dye',
                            'T_cut = ' + str(T_cut_from) + 'C',
-                           'Normalized to "' + file_normSignal + '"']
+                           'Normalized to ' + normSpecification]
             df = pd.DataFrame({'Value': bckg_legend})
             df.to_excel(writer, sheet_name=sheet_name, index=False,
                         startcol=(col_name_num[1] - col_name_num[0]) / col_name_num[2] + shiftResultsCol)
