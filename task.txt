@@ -1,17 +1,15 @@
 # ------------------------------------------------------------------------------------------------------
-# This program allow to find out "BckgIntensity" in two ways with normalization factors:
-# 1.    N1(A, K, T) = 1 / (exp(A) * exp(K*T) + BckgIntensity)
-# 2.    N2(A, K, T) = 1 / (freeDyeSignal + BckgIntensity)
+# This program allow to find out "BckgIntensity" in 4 modes with normalization factors:
+# 1.    N2(A, K, T) = 1 / (DyeSignal + BckgIntensity)
+# 2.    N1(A, K, T) = 1 / (exp(A) * exp(K*T) + BckgIntensity), A and K are the same for all file
+# 3.    N2(A, K, T) = 1 / (exp(A) * exp(K*T) + BckgIntensity), A and K are calculated automatically at interval [T_exp_determ_from,T_exp_determ_to] 
+# 4.    N1(A, K, T) = 1 / (exp(A) * exp(K*T) + BckgIntensity), A and K are specified in file by user
 # So the given section of the normalized function (Melt_Curve(T) + BckgIntensity)/Nx((A, K), T) at temperatures
 # higher than T_cut_less is horizontal.
 # !!! Locate your raw files in ../Raw folder !!!
 # ------------------------------------------------------------------------------------------------------
 
 # Files specifications
-file_normSignal 	= 'cy3'
-# avaliable: 		cy3
-#			cy3-T20-bhq2
-#			ads14-ads14
 
 file_signal 		= 'ATPaptACmm + adsN ratio 1-10'
 sheet_name_body 	= 'ratio '
@@ -24,14 +22,22 @@ Mode			= 4
 normalizeToOne 		= True
 T_cut_from 		= 80
 T_cut_to 		= 95
+
+# For mode 1.
+file_normSignal 	= 'cy3'
+# avaliable: 		cy3
+#			cy3-T20-bhq2
+#			ads14-ads14
+
+# For mode 2. Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
+A 			= 12.70776
+K 			= -0.0371940
+
+# For mode 3.
 useGlobalInterval	= True
 T_exp_determ_from 	= 80
 T_exp_determ_to 	= 95
 evoluteExponent 	= False
-
-# Parameters exp(A) * exp(K*T) comes from experimental measurements of Cy3T8 intensity on temperature
-A 			= 12.70776
-K 			= -0.0371940
 
 # Range of background intensities checked sequentially with step (use int)
 maxBckgIntensity 	= 40000
